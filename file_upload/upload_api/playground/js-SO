@@ -1,0 +1,16 @@
+var fileSize = file.size;
+                var chunks = Math.ceil(file.size / chunkSize, chunkSize);
+                var chunk = 0;
+
+                while (chunk <= chunks) {
+                    var offset = chunk * chunkSize;
+                    console.log('current chunk..', chunk);
+                    console.log('offset...', chunk * chunkSize);
+                    console.log('file blob from offset...', offset)
+                    var blob = file.slice(offset, chunkSize);
+                    console.log('File size...', file.size);
+                    console.log('Blob size...', blob.size);
+                    var formData = new FormData()
+                    formData.append('source', blob)
+                    formData.append('chunk', chunk+1)
+                }
