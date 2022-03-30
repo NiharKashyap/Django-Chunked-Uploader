@@ -1,4 +1,3 @@
-
 from django.core.files import File
 from django.shortcuts import render
 from django.http.response import JsonResponse
@@ -29,6 +28,7 @@ def upload_partial(request):
 
 @csrf_exempt
 def upload_complete(request):
+    before = time.time()
     id = request.POST["file_id"]
     objects = FileModel.objects.all().filter(file_id=id, is_chunk=True)
     file_path = os.path.join(settings.MEDIA_ROOT, 'files\\' , request.POST["file_name"])
@@ -47,6 +47,8 @@ def upload_complete(request):
         print(e)
     objects.delete()
     
+    now = time.time()
+    print(now-before)
     return JsonResponse({"Message":instance.id, "url":instance.file.url})
         
 

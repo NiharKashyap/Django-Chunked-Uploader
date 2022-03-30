@@ -28,6 +28,7 @@
     </script>
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"
         integrity="sha256-/xUj+3OJU5yExlq6GSYGSHk7tPXikynS7ogEvDej/m4=" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
     <script>
         function sleep(ms) 
         {
@@ -51,13 +52,11 @@
 
                     // await sleep(1000) //Sleep for 1 second to demonstrate progress bar effect
                     var formData = new FormData()
-                    formData.append('start', start)
                     let newEnd = start + chunkSize;
                     var blob = file.slice(start, newEnd);
                     start = newEnd;
                     formData.append('source', blob)
                     formData.append('chunk', chunk+1)
-                    
                     formData.append('total_chunks', chunks)
                     formData.append('file_id', file_id)
                     formData.append('file_name', file_name)
@@ -78,34 +77,36 @@
                             var percentage = Math.round(chunks_sent/chunks * 100)
                             document.getElementById('progress_bar').style.width= String(percentage) + "%"  
                             document.getElementById('progress_bar').innerHTML= String(percentage) + " %"  
-                            
+                            if(percentage==100)
+                            {
+                                callComplete(file_name, file_id)
+                            }
                         },
                         error: function (error) {
                             console.log("Failed to send part " + chunk)
                         }
                     })
                 }
-                // $.ajax({
-                //         type: "POST",
-                //         url: "http://127.0.0.1:8000/upload_complete/",
-                //         data: {'file_id':file_id, 'file_name':file_name},
-                //         enctype: 'application/x-www-form-urlencoded',
-                //         success: function (res) 
-                //         {
-                //             console.log("Success")
-                            
-                //             var img = document.createElement("img");
-                //             img.src = res.url
-                //             img.style.width="100%"
-                //             img.style.height="auto"
-                //             document.getElementById('img_holder').appendChild(img)
-                            
-                //         },
-                //         error: function (error) 
-                //         {
-                //             console.log("error")
-                //         }
-                //     })
+                function callComplete(name, id)
+                {
+                    const header = {'Content-Type': 'application/x-www-form-urlencoded'}
+                    let data = new FormData()
+                    data.append("file_id",id)
+                    data.append("file_name",name)
+                    axios.post("http://127.0.0.1:8000/upload_complete/", data)
+                    .then(response=>{
+                        console.log(response.data)
+                        var res = response.data.url
+                        var img = document.createElement("img");
+                        img.src = res
+                        img.style.width="100%"
+                        img.style.height="auto"
+                        img_holder = document.getElementById('img_holder')
+                        img_holder.replaceChild(img, img_holder.childNodes[0])
+                    })
+                    .catch(errors=>console.log(errors))
+                }
+                
             }
         );
 

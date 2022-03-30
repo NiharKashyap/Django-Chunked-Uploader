@@ -1,4 +1,3 @@
-
 from django.core.files import File
 from django.shortcuts import render
 from django.http.response import JsonResponse
@@ -6,6 +5,7 @@ from django.views.decorators.csrf import csrf_exempt
 from .models import FileModel
 from django.conf import settings
 import os
+import time
 
 # Create your views here.
 
@@ -23,10 +23,13 @@ def upload_partial(request):
         f = open(file_path, "wb")
         f.write(model_file.read())
         f.close()
+        print('Saved chunk ', request.POST["chunk"])
+        
         return JsonResponse({'Message':"Success"})
 
 @csrf_exempt
 def upload_complete(request):
+    before = time.time()
     id = request.POST["file_id"]
     name = request.POST["file_name"]
     
@@ -53,7 +56,8 @@ def upload_complete(request):
         instance.save()
     except Exception as e:
         print(e)
-
+    
+    now = time.time()
     return JsonResponse({"Message":instance.id, "url":instance.file.url})
         
 

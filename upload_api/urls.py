@@ -1,7 +1,7 @@
 from django.urls import path
 # from .views_save_db import *
-# from .views_save_file import *
-from .views_save_seek import *
+from .views_save_file import *
+# from .views_save_seek import *
 
 
 urlpatterns = [
